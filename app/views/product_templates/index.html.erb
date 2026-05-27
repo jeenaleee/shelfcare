@@ -1,0 +1,99 @@
+<h1>
+  List of all products
+</h1>
+
+<hr>
+
+<article>
+  <header>
+    <h2>
+      Add a new product
+    </h2>
+  </header>
+
+  <form action="/insert_product" method="post">
+    <div>
+      <label for="name_box">
+        Name
+      </label>
+
+      <input type="text" id="name_box" name="query_name">
+    </div>
+
+    <div>
+      <label for="brand_box">
+        Brand
+      </label>
+
+      <input type="text" id="brand_box" name="query_brand">
+    </div>
+
+    <div>
+      <label for="open_date_box">
+        Open date
+      </label>
+
+      <input type="date" id="open_date_box" name="query_open_date">
+    </div>
+
+    <div>
+      <label for="pao_months_box">
+        Pao months
+      </label>
+
+      <input type="text" id="pao_months_box" name="query_pao_months">
+    </div>
+
+    <div>
+      <label for="notes_box">
+        Notes
+      </label>
+
+      <input type="text" id="notes_box" name="query_notes">
+    </div>
+
+    <div>
+      <label for="photo_box">
+        Photo
+      </label>
+
+      <input type="text" id="photo_box" name="query_photo">
+    </div>
+
+    <div>
+      <label for="user_id_box">
+        User
+      </label>
+
+      <input type="text" id="user_id_box" name="query_user_id">
+    </div>
+
+    <div>
+      <label for="category_id_box">
+        Category
+      </label>
+
+      <input type="text" id="category_id_box" name="query_category_id">
+    </div>
+
+    <button type="submit">
+      Create product
+    </button>
+  </form>
+</article>
+
+<hr>
+
+<article>
+  <ul>
+    <% @list_of_products.each do |a_product| %>
+      <li>
+        <a href="/products/<%= a_product.id %>">
+          Product #<%= a_product.id %>
+        </a>
+      </li>
+    <% end %>
+  </ul>
+</article>
+
+<hr>

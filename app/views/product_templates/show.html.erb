@@ -1,0 +1,171 @@
+<h1>
+  Product #<%= @the_product.id %> details
+</h1>
+
+<article>
+  <div>
+    <a href="/products">
+      Go back
+    </a>
+  </div>
+
+  <div>
+    <a href="/delete_product/<%= @the_product.id %>">
+      Delete product
+    </a>
+  </div>
+  <dl>
+    <dt>
+      Name
+    </dt>
+    <dd>
+      <%= @the_product.name %>
+    </dd>
+
+    <dt>
+      Brand
+    </dt>
+    <dd>
+      <%= @the_product.brand %>
+    </dd>
+
+    <dt>
+      Open date
+    </dt>
+    <dd>
+      <%= @the_product.open_date %>
+    </dd>
+
+    <dt>
+      Pao months
+    </dt>
+    <dd>
+      <%= @the_product.pao_months %>
+    </dd>
+
+    <dt>
+      Notes
+    </dt>
+    <dd>
+      <%= @the_product.notes %>
+    </dd>
+
+    <dt>
+      Photo
+    </dt>
+    <dd>
+      <%= @the_product.photo %>
+    </dd>
+
+    <dt>
+      User
+    </dt>
+    <dd>
+      <%= @the_product.user_id %>
+    </dd>
+
+    <dt>
+      Category
+    </dt>
+    <dd>
+      <%= @the_product.category_id %>
+    </dd>
+
+    <dt>
+      Created at
+    </dt>
+    <dd>
+      <%= time_ago_in_words(@the_product.created_at) %> ago
+    </dd>
+
+    <dt>
+      Updated at
+    </dt>
+    <dd>
+      <%= time_ago_in_words(@the_product.updated_at) %> ago
+    </dd>
+  </dl>
+</article>
+
+<hr>
+
+
+<article>
+  <header>
+    <h2>
+      Edit product
+    </h2>
+  </header>
+
+  <form action="/modify_product/<%= @the_product.id %>"  method="post" >
+    <div>
+      <label for="name_box">
+        Name
+      </label>
+
+      <input type="text" id="name_box" name="query_name" value="<%= @the_product.name %>">
+    </div>
+
+    <div>
+      <label for="brand_box">
+        Brand
+      </label>
+
+      <input type="text" id="brand_box" name="query_brand" value="<%= @the_product.brand %>">
+    </div>
+
+    <div>
+      <label for="open_date_box">
+        Open date
+      </label>
+
+      <input type="date" id="open_date_box" name="query_open_date" value="<%= @the_product.open_date %>">
+    </div>
+
+    <div>
+      <label for="pao_months_box">
+        Pao months
+      </label>
+
+      <input type="text" id="pao_months_box" name="query_pao_months" value="<%= @the_product.pao_months %>">
+    </div>
+
+    <div>
+      <label for="notes_box">
+        Notes
+      </label>
+
+      <input type="text" id="notes_box" name="query_notes" value="<%= @the_product.notes %>">
+    </div>
+
+    <div>
+      <label for="photo_box">
+        Photo
+      </label>
+
+      <input type="text" id="photo_box" name="query_photo" value="<%= @the_product.photo %>">
+    </div>
+
+    <div>
+      <label for="user_id_box">
+        User
+      </label>
+
+      <input type="text" id="user_id_box" name="query_user_id" value="<%= @the_product.user_id %>">
+    </div>
+
+    <div>
+      <label for="category_id_box">
+        Category
+      </label>
+
+      <input type="text" id="category_id_box" name="query_category_id" value="<%= @the_product.category_id %>">
+    </div>
+
+    <button type="submit">
+      Update product
+    </button>
+  </form>
+</article>
+
+<hr>
