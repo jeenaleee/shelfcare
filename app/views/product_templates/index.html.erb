@@ -1,99 +1,93 @@
-<h1>
-  List of all products
-</h1>
+<h1>My Shelf </h1>
+
+<% if notice.present? %>
+  <p style="color: green;"><%= notice %></p>
+<% end %>
+
+<% if alert.present? %>
+  <p style="color: red;"><%= alert %></p>
+<% end %>
 
 <hr>
 
 <article>
   <header>
-    <h2>
-      Add a new product
-    </h2>
+    <h2>Add a new product</h2>
   </header>
 
   <form action="/insert_product" method="post">
-    <div>
-      <label for="name_box">
-        Name
-      </label>
+    <input type="hidden" name="authenticity_token" value="<%= form_authenticity_token %>">
 
-      <input type="text" id="name_box" name="query_name">
+    <div>
+      <label for="name_box">Name</label>
+      <input type="text" id="name_box" name="query_name" placeholder="e.g. Rare Beauty Blush">
     </div>
 
     <div>
-      <label for="brand_box">
-        Brand
-      </label>
-
-      <input type="text" id="brand_box" name="query_brand">
+      <label for="brand_box">Brand</label>
+      <input type="text" id="brand_box" name="query_brand" placeholder="e.g. Rare Beauty">
     </div>
 
     <div>
-      <label for="open_date_box">
-        Open date
-      </label>
-
+      <label for="open_date_box">Date Opened</label>
       <input type="date" id="open_date_box" name="query_open_date">
     </div>
 
     <div>
-      <label for="pao_months_box">
-        Pao months
-      </label>
-
-      <input type="text" id="pao_months_box" name="query_pao_months">
+      <label for="pao_months_box">PAO (months)</label>
+      <input type="number" id="pao_months_box" name="query_pao_months" placeholder="e.g. 12">
     </div>
 
     <div>
-      <label for="notes_box">
-        Notes
-      </label>
-
-      <input type="text" id="notes_box" name="query_notes">
+      <label for="category_id_box">Category</label>
+      <select id="category_id_box" name="query_category_id">
+        <option value="">-- Select a category --</option>
+        <% Category.all.each do |a_category| %>
+          <option value="<%= a_category.id %>"><%= a_category.name %></option>
+        <% end %>
+      </select>
     </div>
 
     <div>
-      <label for="photo_box">
-        Photo
-      </label>
-
-      <input type="text" id="photo_box" name="query_photo">
+      <label for="notes_box">Notes</label>
+      <input type="text" id="notes_box" name="query_notes" placeholder="Optional notes">
     </div>
 
-    <div>
-      <label for="user_id_box">
-        User
-      </label>
-
-      <input type="text" id="user_id_box" name="query_user_id">
-    </div>
-
-    <div>
-      <label for="category_id_box">
-        Category
-      </label>
-
-      <input type="text" id="category_id_box" name="query_category_id">
-    </div>
-
-    <button type="submit">
-      Create product
-    </button>
+    <button type="submit">Add to Shelf</button>
   </form>
 </article>
 
 <hr>
 
 <article>
-  <ul>
-    <% @list_of_products.each do |a_product| %>
-      <li>
-        <a href="/products/<%= a_product.id %>">
-          Product #<%= a_product.id %>
-        </a>
-      </li>
-    <% end %>
-  </ul>
+  <h2>Your Shelf</h2>
+
+  <% if @list_of_products.empty? %>
+    <p>No products yet — add your first one above!</p>
+  <% else %>
+    <ul>
+      <% @list_of_products.each do |a_product| %>
+        <li>
+          <a href="/products/<%= a_product.id %>">
+            <strong><%= a_product.name %></strong>
+          </a>
+          <%= a_product.brand %>
+
+          —
+
+          Expires: <%= a_product.expiry_date.strftime("%b %d, %Y") %>
+
+          <% if a_product.status == "expired" %>
+            <span style="color: red; font-weight: bold;">● Expired</span>
+          <% elsif a_product.status == "expiring soon" %>
+            <span style="color: orange; font-weight: bold;">● Expiring Soon</span>
+          <% else %>
+            <span style="color: green; font-weight: bold;">● Good</span>
+          <% end %>
+        </li>
+      <% end %>
+    </ul>
+  <% end %>
 </article>
 
 <hr>
