@@ -46,7 +46,11 @@
       <div class="ms-auto">
         <% if user_signed_in? %>
           <span class="text-white me-3"><%= current_user.email %></span>
-          <a href="/users/sign_out" class="btn btn-outline-light btn-sm" data-turbo-method="delete">Sign Out</a>
+          <form action="/users/sign_out" method="post" style="display:inline;">
+            <input type="hidden" name="authenticity_token" value="<%= form_authenticity_token %>">
+            <input type="hidden" name="_method" value="delete">
+            <button type="submit" class="btn btn-outline-light btn-sm">Sign Out</button>
+          </form>
         <% else %>
           <a href="/users/sign_in" class="btn btn-outline-light btn-sm me-2">Sign In</a>
           <a href="/users/sign_up" class="btn btn-light btn-sm">Sign Up</a>

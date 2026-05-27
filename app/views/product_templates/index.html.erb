@@ -3,20 +3,6 @@
   <a href="/products/new" class="btn btn-dark">+ Add Product</a>
 </div>
 
-<% if @list_of_products.any? %>
-  <p class="text-muted mb-4">
-    <%= @list_of_products.count %> products
-    <% expiring_soon = @list_of_products.select { |p| p.status == "expiring soon" }.count %>
-    <% expired = @list_of_products.select { |p| p.status == "expired" }.count %>
-    <% if expiring_soon > 0 %>
-      · <span class="text-warning fw-500"><%= expiring_soon %> expiring soon</span>
-    <% end %>
-    <% if expired > 0 %>
-      · <span class="text-danger"><%= expired %> expired</span>
-    <% end %>
-  </p>
-<% end %>
-
 <% if notice.present? %>
   <div class="alert alert-success"><%= notice %></div>
 <% end %>
@@ -24,45 +10,127 @@
   <div class="alert alert-danger"><%= alert %></div>
 <% end %>
 
-<% if @list_of_products.empty? %>
+<%
+  active_products = @list_of_products.reject(&:tossed)
+  tossed_products = @list_of_products.select(&:tossed)
+  expired = active_products.select { |p| p.status == "expired" }
+  expiring_soon = active_products.select { |p| p.status == "expiring soon" }
+  good = active_products.select { |p| p.status == "good" }
+%>
+
+<% if active_products.empty? && tossed_products.empty? %>
   <div class="text-center py-5">
     <p class="text-muted mb-3">Your shelf is empty — add your first product!</p>
     <a href="/products/new" class="btn btn-dark">+ Add Product</a>
   </div>
 <% else %>
-  <div class="row row-cols-1 row-cols-md-3 g-4">
-    <% @list_of_products.each do |a_product| %>
-      <div class="col">
-        <a href="/products/<%= a_product.id %>" class="text-decoration-none text-dark">
-          <div class="card h-100 border-0 shadow-sm
-            <% if a_product.status == 'expired' %>
-              bg-danger bg-opacity-10
-            <% elsif a_product.status == 'expiring soon' %>
-              bg-warning bg-opacity-10
-            <% else %>
-              bg-success bg-opacity-10
-            <% end %>
-          ">
-            <div class="card-body">
-              <div class="d-flex justify-content-between align-items-start mb-2">
-                <h5 class="card-title mb-0"><%= a_product.name %></h5>
-                <% if a_product.status == "expired" %>
+
+  <%# EXPIRED SECTION %>
+  <% if expired.any? %>
+    <div class="mb-5">
+      <h2 class="mb-3" style="color: #dc3545;">Expired (<%= expired.count %>)</h2>
+      <div class="row row-cols-1 row-cols-md-3 g-4">
+        <% expired.each do |a_product| %>
+          <div class="col">
+            <div class="card h-100 border-0 shadow-sm bg-danger bg-opacity-10">
+              <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                  <a href="/products/<%= a_product.id %>" class="text-decoration-none text-dark">
+                    <h5 class="card-title mb-0"><%= a_product.name %></h5>
+                  </a>
                   <span class="badge bg-danger">Expired</span>
-                <% elsif a_product.status == "expiring soon" %>
-                  <span class="badge bg-warning text-dark">Expiring Soon</span>
-                <% else %>
-                  <span class="badge bg-success">Good</span>
+                </div>
+                <p class="text-muted small mb-2"><%= a_product.brand %></p>
+                <p class="small mb-3">Expired: <%= a_product.expiry_date.strftime("%b %d, %Y") %></p>
+                <% if a_product.category.present? %>
+                  <span class="badge bg-light text-dark mb-2"><%= a_product.category.name %></span>
                 <% end %>
+                <form action="/toss_product/<%= a_product.id %>" method="post">
+                  <input type="hidden" name="authenticity_token" value="<%= form_authenticity_token %>">
+                  <button type="submit" class="btn btn-sm btn-outline-danger w-100">Toss it</button>
+                </form>
               </div>
-              <p class="text-muted small mb-2"><%= a_product.brand %></p>
-              <p class="small mb-0">Expires: <%= a_product.expiry_date.strftime("%b %d, %Y") %></p>
-              <% if a_product.category.present? %>
-                <span class="badge bg-light text-dark mt-2"><%= a_product.category.name %></span>
-              <% end %>
             </div>
           </div>
-        </a>
+        <% end %>
       </div>
-    <% end %>
-  </div>
+    </div>
+  <% end %>
+
+  <%# EXPIRING SOON SECTION %>
+  <% if expiring_soon.any? %>
+    <div class="mb-5">
+      <h2 class="mb-3" style="color: #fd7e14;">Expiring Soon (<%= expiring_soon.count %>)</h2>
+      <div class="row row-cols-1 row-cols-md-3 g-4">
+        <% expiring_soon.each do |a_product| %>
+          <div class="col">
+            <a href="/products/<%= a_product.id %>" class="text-decoration-none text-dark">
+              <div class="card h-100 border-0 shadow-sm bg-warning bg-opacity-10">
+                <div class="card-body">
+                  <div class="d-flex justify-content-between align-items-start mb-2">
+                    <h5 class="card-title mb-0"><%= a_product.name %></h5>
+                    <span class="badge bg-warning text-dark">Expiring Soon</span>
+                  </div>
+                  <p class="text-muted small mb-2"><%= a_product.brand %></p>
+                  <p class="small mb-0">Expires: <%= a_product.expiry_date.strftime("%b %d, %Y") %></p>
+                  <% if a_product.category.present? %>
+                    <span class="badge bg-light text-dark mt-2"><%= a_product.category.name %></span>
+                  <% end %>
+                </div>
+              </div>
+            </a>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+
+  <%# GOOD SECTION %>
+  <% if good.any? %>
+    <div class="mb-5">
+      <h2 class="mb-3" style="color: #198754;">Good (<%= good.count %>)</h2>
+      <div class="row row-cols-1 row-cols-md-3 g-4">
+        <% good.each do |a_product| %>
+          <div class="col">
+            <a href="/products/<%= a_product.id %>" class="text-decoration-none text-dark">
+              <div class="card h-100 border-0 shadow-sm bg-success bg-opacity-10">
+                <div class="card-body">
+                  <div class="d-flex justify-content-between align-items-start mb-2">
+                    <h5 class="card-title mb-0"><%= a_product.name %></h5>
+                    <span class="badge bg-success">Good</span>
+                  </div>
+                  <p class="text-muted small mb-2"><%= a_product.brand %></p>
+                  <p class="small mb-0">Expires: <%= a_product.expiry_date.strftime("%b %d, %Y") %></p>
+                  <% if a_product.category.present? %>
+                    <span class="badge bg-light text-dark mt-2"><%= a_product.category.name %></span>
+                  <% end %>
+                </div>
+              </div>
+            </a>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+
+  <%# TOSSED SECTION %>
+  <% if tossed_products.any? %>
+    <div class="mb-5">
+      <h2 class="mb-3 text-muted">Tossed (<%= tossed_products.count %>)</h2>
+      <div class="row row-cols-1 row-cols-md-3 g-4">
+        <% tossed_products.each do |a_product| %>
+          <div class="col">
+            <div class="card h-100 border-0 shadow-sm" style="opacity: 0.5;">
+              <div class="card-body">
+                <h5 class="card-title mb-0 text-muted"><s><%= a_product.name %></s></h5>
+                <p class="text-muted small mb-0"><%= a_product.brand %></p>
+                <span class="badge bg-secondary mt-2">Tossed</span>
+              </div>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+
 <% end %>

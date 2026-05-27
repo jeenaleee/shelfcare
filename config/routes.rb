@@ -10,7 +10,7 @@ Rails.application.routes.draw do
   post("/modify_product/:path_id", { :controller => "products", :action => "update" })
   get("/delete_product/:path_id", { :controller => "products", :action => "destroy" })
   
-
+  post("/toss_product/:path_id", { :controller => "products", :action => "toss" })
 
   post("/insert_category", { :controller => "categories", :action => "create" })
 

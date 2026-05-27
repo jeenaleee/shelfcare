@@ -9,6 +9,7 @@
 #  open_date   :date
 #  pao_months  :integer
 #  photo       :string
+#  tossed      :boolean
 #  created_at  :datetime         not null
 #  updated_at  :datetime         not null
 #  category_id :integer

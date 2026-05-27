@@ -78,7 +78,7 @@ class ProductsController < ApplicationController
                                                                      })
 
     result = JSON.parse(response.body.to_s)
-  
+
     content_string = result.dig("choices", 0, "message", "content")
 
     if content_string.nil?
@@ -91,5 +91,13 @@ class ProductsController < ApplicationController
 
   def new
     render({ :template => "product_templates/new" })
+  end
+
+  def toss
+    the_id = params.fetch("path_id")
+    the_product = current_user.products.where({ :id => the_id }).at(0)
+    the_product.tossed = true
+    the_product.save
+    redirect_to("/products", { :notice => "Product tossed!" })
   end
 end
