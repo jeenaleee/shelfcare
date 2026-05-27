@@ -1,93 +1,68 @@
-<h1>My Shelf </h1>
+<div class="d-flex align-items-center justify-content-between mb-2">
+  <h1 class="mb-0">My Shelf</h1>
+  <a href="/products/new" class="btn btn-dark">+ Add Product</a>
+</div>
+
+<% if @list_of_products.any? %>
+  <p class="text-muted mb-4">
+    <%= @list_of_products.count %> products
+    <% expiring_soon = @list_of_products.select { |p| p.status == "expiring soon" }.count %>
+    <% expired = @list_of_products.select { |p| p.status == "expired" }.count %>
+    <% if expiring_soon > 0 %>
+      · <span class="text-warning fw-500"><%= expiring_soon %> expiring soon</span>
+    <% end %>
+    <% if expired > 0 %>
+      · <span class="text-danger"><%= expired %> expired</span>
+    <% end %>
+  </p>
+<% end %>
 
 <% if notice.present? %>
-  <p style="color: green;"><%= notice %></p>
+  <div class="alert alert-success"><%= notice %></div>
 <% end %>
-
 <% if alert.present? %>
-  <p style="color: red;"><%= alert %></p>
+  <div class="alert alert-danger"><%= alert %></div>
 <% end %>
 
-<hr>
-
-<article>
-  <header>
-    <h2>Add a new product</h2>
-  </header>
-
-  <form action="/insert_product" method="post">
-    <input type="hidden" name="authenticity_token" value="<%= form_authenticity_token %>">
-
-    <div>
-      <label for="name_box">Name</label>
-      <input type="text" id="name_box" name="query_name" placeholder="e.g. Rare Beauty Blush">
-    </div>
-
-    <div>
-      <label for="brand_box">Brand</label>
-      <input type="text" id="brand_box" name="query_brand" placeholder="e.g. Rare Beauty">
-    </div>
-
-    <div>
-      <label for="open_date_box">Date Opened</label>
-      <input type="date" id="open_date_box" name="query_open_date">
-    </div>
-
-    <div>
-      <label for="pao_months_box">PAO (months)</label>
-      <input type="number" id="pao_months_box" name="query_pao_months" placeholder="e.g. 12">
-    </div>
-
-    <div>
-      <label for="category_id_box">Category</label>
-      <select id="category_id_box" name="query_category_id">
-        <option value="">-- Select a category --</option>
-        <% Category.all.each do |a_category| %>
-          <option value="<%= a_category.id %>"><%= a_category.name %></option>
-        <% end %>
-      </select>
-    </div>
-
-    <div>
-      <label for="notes_box">Notes</label>
-      <input type="text" id="notes_box" name="query_notes" placeholder="Optional notes">
-    </div>
-
-    <button type="submit">Add to Shelf</button>
-  </form>
-</article>
-
-<hr>
-
-<article>
-  <h2>Your Shelf</h2>
-
-  <% if @list_of_products.empty? %>
-    <p>No products yet — add your first one above!</p>
-  <% else %>
-    <ul>
-      <% @list_of_products.each do |a_product| %>
-        <li>
-          <a href="/products/<%= a_product.id %>">
-            <strong><%= a_product.name %></strong>
-          </a>
-          <%= a_product.brand %>
-
-          —
-
-          Expires: <%= a_product.expiry_date.strftime("%b %d, %Y") %>
-
-          <% if a_product.status == "expired" %>
-            <span style="color: red; font-weight: bold;">● Expired</span>
-          <% elsif a_product.status == "expiring soon" %>
-            <span style="color: orange; font-weight: bold;">● Expiring Soon</span>
-          <% else %>
-            <span style="color: green; font-weight: bold;">● Good</span>
-          <% end %>
-        </li>
-      <% end %>
-    </ul>
-  <% end %>
-</article>
-
-<hr>
+<% if @list_of_products.empty? %>
+  <div class="text-center py-5">
+    <p class="text-muted mb-3">Your shelf is empty — add your first product!</p>
+    <a href="/products/new" class="btn btn-dark">+ Add Product</a>
+  </div>
+<% else %>
+  <div class="row row-cols-1 row-cols-md-3 g-4">
+    <% @list_of_products.each do |a_product| %>
+      <div class="col">
+        <a href="/products/<%= a_product.id %>" class="text-decoration-none text-dark">
+          <div class="card h-100 border-0 shadow-sm
+            <% if a_product.status == 'expired' %>
+              bg-danger bg-opacity-10
+            <% elsif a_product.status == 'expiring soon' %>
+              bg-warning bg-opacity-10
+            <% else %>
+              bg-success bg-opacity-10
+            <% end %>
+          ">
+            <div class="card-body">
+              <div class="d-flex justify-content-between align-items-start mb-2">
+                <h5 class="card-title mb-0"><%= a_product.name %></h5>
+                <% if a_product.status == "expired" %>
+                  <span class="badge bg-danger">Expired</span>
+                <% elsif a_product.status == "expiring soon" %>
+                  <span class="badge bg-warning text-dark">Expiring Soon</span>
+                <% else %>
+                  <span class="badge bg-success">Good</span>
+                <% end %>
+              </div>
+              <p class="text-muted small mb-2"><%= a_product.brand %></p>
+              <p class="small mb-0">Expires: <%= a_product.expiry_date.strftime("%b %d, %Y") %></p>
+              <% if a_product.category.present? %>
+                <span class="badge bg-light text-dark mt-2"><%= a_product.category.name %></span>
+              <% end %>
+            </div>
+          </div>
+        </a>
+      </div>
+    <% end %>
+  </div>
+<% end %>

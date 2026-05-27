@@ -1,171 +1,99 @@
-<h1>
-  Product #<%= @the_product.id %> details
-</h1>
+<div class="mb-4">
+  <a href="/products" class="text-muted text-decoration-none">← Back to My Shelf</a>
+</div>
 
-<article>
-  <div>
-    <a href="/products">
-      Go back
-    </a>
+<div class="row" style="max-width: 700px;">
+  <div class="col">
+
+    <div class="d-flex align-items-center justify-content-between mb-2">
+      <h1 class="mb-0"><%= @the_product.name %></h1>
+      <% if @the_product.status == "expired" %>
+        <span class="badge bg-danger">Expired</span>
+      <% elsif @the_product.status == "expiring soon" %>
+        <span class="badge bg-warning text-dark">Expiring Soon</span>
+      <% else %>
+        <span class="badge bg-success">Good</span>
+      <% end %>
+    </div>
+
+    <p class="text-muted mb-4"><%= @the_product.brand %></p>
+
+    <dl class="row mb-4">
+      <dt class="col-sm-4">Date Opened</dt>
+      <dd class="col-sm-8"><%= @the_product.open_date.strftime("%b %d, %Y") %></dd>
+
+      <dt class="col-sm-4">PAO</dt>
+      <dd class="col-sm-8"><%= @the_product.pao_months %> months</dd>
+
+      <dt class="col-sm-4">Expires On</dt>
+      <dd class="col-sm-8"><%= @the_product.expiry_date.strftime("%b %d, %Y") %></dd>
+
+      <% if @the_product.category.present? %>
+        <dt class="col-sm-4">Category</dt>
+        <dd class="col-sm-8"><%= @the_product.category.name %></dd>
+      <% end %>
+
+      <% if @the_product.notes.present? %>
+        <dt class="col-sm-4">Notes</dt>
+        <dd class="col-sm-8"><%= @the_product.notes %></dd>
+      <% end %>
+
+      <dt class="col-sm-4">Added</dt>
+      <dd class="col-sm-8"><%= time_ago_in_words(@the_product.created_at) %> ago</dd>
+    </dl>
+
+    <hr>
+
+    <h2 class="mb-4">Edit Product</h2>
+
+    <form action="/modify_product/<%= @the_product.id %>" method="post">
+      <input type="hidden" name="authenticity_token" value="<%= form_authenticity_token %>">
+
+      <div class="mb-3">
+        <label for="name_box" class="form-label">Name</label>
+        <input type="text" id="name_box" name="query_name" class="form-control" value="<%= @the_product.name %>">
+      </div>
+
+      <div class="mb-3">
+        <label for="brand_box" class="form-label">Brand</label>
+        <input type="text" id="brand_box" name="query_brand" class="form-control" value="<%= @the_product.brand %>">
+      </div>
+
+      <div class="mb-3">
+        <label for="open_date_box" class="form-label">Date Opened</label>
+        <input type="date" id="open_date_box" name="query_open_date" class="form-control" value="<%= @the_product.open_date %>">
+      </div>
+
+      <div class="mb-3">
+        <label for="pao_months_box" class="form-label">PAO (months)</label>
+        <input type="number" id="pao_months_box" name="query_pao_months" class="form-control" value="<%= @the_product.pao_months %>">
+      </div>
+
+      <div class="mb-3">
+        <label for="category_id_box" class="form-label">Category</label>
+        <select id="category_id_box" name="query_category_id" class="form-select">
+          <option value="">-- Select a category --</option>
+          <% Category.all.each do |a_category| %>
+            <option value="<%= a_category.id %>" <%= @the_product.category_id == a_category.id ? "selected" : "" %>>
+              <%= a_category.name %>
+            </option>
+          <% end %>
+        </select>
+      </div>
+
+      <div class="mb-3">
+        <label for="notes_box" class="form-label">Notes</label>
+        <input type="text" id="notes_box" name="query_notes" class="form-control" value="<%= @the_product.notes %>">
+      </div>
+
+      <div class="d-flex gap-2">
+        <button type="submit" class="btn btn-dark">Save Changes</button>
+        <a href="/delete_product/<%= @the_product.id %>" class="btn btn-outline-danger"
+           onclick="return confirm('Are you sure you want to delete this product?')">
+          Delete
+        </a>
+      </div>
+    </form>
+
   </div>
-
-  <div>
-    <a href="/delete_product/<%= @the_product.id %>">
-      Delete product
-    </a>
-  </div>
-  <dl>
-    <dt>
-      Name
-    </dt>
-    <dd>
-      <%= @the_product.name %>
-    </dd>
-
-    <dt>
-      Brand
-    </dt>
-    <dd>
-      <%= @the_product.brand %>
-    </dd>
-
-    <dt>
-      Open date
-    </dt>
-    <dd>
-      <%= @the_product.open_date %>
-    </dd>
-
-    <dt>
-      Pao months
-    </dt>
-    <dd>
-      <%= @the_product.pao_months %>
-    </dd>
-
-    <dt>
-      Notes
-    </dt>
-    <dd>
-      <%= @the_product.notes %>
-    </dd>
-
-    <dt>
-      Photo
-    </dt>
-    <dd>
-      <%= @the_product.photo %>
-    </dd>
-
-    <dt>
-      User
-    </dt>
-    <dd>
-      <%= @the_product.user_id %>
-    </dd>
-
-    <dt>
-      Category
-    </dt>
-    <dd>
-      <%= @the_product.category_id %>
-    </dd>
-
-    <dt>
-      Created at
-    </dt>
-    <dd>
-      <%= time_ago_in_words(@the_product.created_at) %> ago
-    </dd>
-
-    <dt>
-      Updated at
-    </dt>
-    <dd>
-      <%= time_ago_in_words(@the_product.updated_at) %> ago
-    </dd>
-  </dl>
-</article>
-
-<hr>
-
-
-<article>
-  <header>
-    <h2>
-      Edit product
-    </h2>
-  </header>
-
-  <form action="/modify_product/<%= @the_product.id %>"  method="post" >
-    <div>
-      <label for="name_box">
-        Name
-      </label>
-
-      <input type="text" id="name_box" name="query_name" value="<%= @the_product.name %>">
-    </div>
-
-    <div>
-      <label for="brand_box">
-        Brand
-      </label>
-
-      <input type="text" id="brand_box" name="query_brand" value="<%= @the_product.brand %>">
-    </div>
-
-    <div>
-      <label for="open_date_box">
-        Open date
-      </label>
-
-      <input type="date" id="open_date_box" name="query_open_date" value="<%= @the_product.open_date %>">
-    </div>
-
-    <div>
-      <label for="pao_months_box">
-        Pao months
-      </label>
-
-      <input type="text" id="pao_months_box" name="query_pao_months" value="<%= @the_product.pao_months %>">
-    </div>
-
-    <div>
-      <label for="notes_box">
-        Notes
-      </label>
-
-      <input type="text" id="notes_box" name="query_notes" value="<%= @the_product.notes %>">
-    </div>
-
-    <div>
-      <label for="photo_box">
-        Photo
-      </label>
-
-      <input type="text" id="photo_box" name="query_photo" value="<%= @the_product.photo %>">
-    </div>
-
-    <div>
-      <label for="user_id_box">
-        User
-      </label>
-
-      <input type="text" id="user_id_box" name="query_user_id" value="<%= @the_product.user_id %>">
-    </div>
-
-    <div>
-      <label for="category_id_box">
-        Category
-      </label>
-
-      <input type="text" id="category_id_box" name="query_category_id" value="<%= @the_product.category_id %>">
-    </div>
-
-    <button type="submit">
-      Update product
-    </button>
-  </form>
-</article>
-
-<hr>
+</div>

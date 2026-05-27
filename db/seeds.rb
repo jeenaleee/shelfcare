@@ -7,3 +7,12 @@
 #   ["Action", "Comedy", "Drama", "Horror"].each do |genre_name|
 #     MovieGenre.find_or_create_by!(name: genre_name)
 #   end
+
+
+Category.create(name: "Skincare")
+Category.create(name: "Face")
+Category.create(name: "Eye")
+Category.create(name: "Lip")
+Category.create(name: "Body")
+Category.create(name: "Hair")
+Category.create(name: "SPF")

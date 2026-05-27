@@ -1,41 +1,28 @@
 Rails.application.routes.draw do
-  # Routes for the Product resource:
 
-  # CREATE
+
+
   post("/insert_product", { :controller => "products", :action => "create" })
+  get("/products/new", { :controller => "products", :action => "new" })
 
-  # READ
   get("/products", { :controller => "products", :action => "index" })
-
   get("/products/:path_id", { :controller => "products", :action => "show" })
-
-  # UPDATE
-
   post("/modify_product/:path_id", { :controller => "products", :action => "update" })
-
-  # DELETE
   get("/delete_product/:path_id", { :controller => "products", :action => "destroy" })
+  
 
-  #------------------------------
 
-  # Routes for the Category resource:
-
-  # CREATE
   post("/insert_category", { :controller => "categories", :action => "create" })
 
-  # READ
   get("/categories", { :controller => "categories", :action => "index" })
 
   get("/categories/:path_id", { :controller => "categories", :action => "show" })
 
-  # UPDATE
-
   post("/modify_category/:path_id", { :controller => "categories", :action => "update" })
 
-  # DELETE
   get("/delete_category/:path_id", { :controller => "categories", :action => "destroy" })
 
-  #------------------------------
+  post("/ai_lookup", { :controller => "products", :action => "ai_lookup" })
 
   devise_for :users
 

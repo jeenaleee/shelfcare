@@ -14,6 +14,7 @@
 #  category_id :integer
 #  user_id     :integer
 #
+
 class Product < ApplicationRecord
   belongs_to :user, counter_cache: true
   belongs_to :category, counter_cache: true, optional: true

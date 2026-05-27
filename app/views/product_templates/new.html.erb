@@ -1,0 +1,114 @@
+<div class="mb-4">
+  <a href="/products" class="text-muted text-decoration-none">← Back to My Shelf</a>
+</div>
+
+<h1 class="mb-4">Add a Product</h1>
+
+<%# AI Lookup Section %>
+<div class="mb-4 p-4 border rounded" style="max-width: 500px; background-color: #f8f8f6;">
+  <label class="form-label fw-500">Search for a product</label>
+  <p class="text-muted small mb-2">Type a product name and we'll fill in the details for you.</p>
+  <div class="d-flex gap-2">
+    <input type="text" id="ai_search_box" class="form-control" placeholder="e.g. NARS Radiant Creamy Concealer">
+    <button type="button" id="ai_lookup_btn" class="btn btn-dark" onclick="lookupProduct()">Look it up</button>
+  </div>
+  <p id="ai_status" class="text-muted small mt-2" style="display:none;">Searching...</p>
+</div>
+
+<form action="/insert_product" method="post" style="max-width: 500px;">
+  <input type="hidden" name="authenticity_token" value="<%= form_authenticity_token %>">
+
+  <div class="mb-3">
+    <label for="name_box" class="form-label">Product Name</label>
+    <input type="text" id="name_box" name="query_name" class="form-control" placeholder="e.g. Rare Beauty Blush">
+  </div>
+
+  <div class="mb-3">
+    <label for="brand_box" class="form-label">Brand</label>
+    <input type="text" id="brand_box" name="query_brand" class="form-control" placeholder="e.g. Rare Beauty">
+  </div>
+
+  <div class="mb-3">
+    <label for="open_date_box" class="form-label">Date Opened</label>
+    <input type="date" id="open_date_box" name="query_open_date" class="form-control">
+  </div>
+
+  <div class="mb-3">
+    <label for="pao_months_box" class="form-label">PAO (months)</label>
+    <input type="number" id="pao_months_box" name="query_pao_months" class="form-control" placeholder="e.g. 12">
+  </div>
+
+  <div class="mb-3">
+    <label for="category_id_box" class="form-label">Category</label>
+    <select id="category_id_box" name="query_category_id" class="form-select">
+      <option value="">-- Select a category --</option>
+      <% Category.all.each do |a_category| %>
+        <option value="<%= a_category.id %>"><%= a_category.name %></option>
+      <% end %>
+    </select>
+  </div>
+
+  <div class="mb-3">
+    <label for="notes_box" class="form-label">Notes</label>
+    <input type="text" id="notes_box" name="query_notes" class="form-control" placeholder="Optional notes">
+  </div>
+
+  <div class="d-flex gap-2">
+    <button type="submit" class="btn btn-dark">Add to Shelf</button>
+    <a href="/products" class="btn btn-outline-secondary">Cancel</a>
+  </div>
+</form>
+
+<script>
+  function lookupProduct() {
+    const productName = document.getElementById("ai_search_box").value;
+    if (!productName) return;
+
+    const status = document.getElementById("ai_status");
+    const btn = document.getElementById("ai_lookup_btn");
+    status.style.display = "block";
+    status.textContent = "Searching...";
+    btn.disabled = true;
+
+    fetch("/ai_lookup", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRF-Token": "<%= form_authenticity_token %>"
+      },
+      body: JSON.stringify({ product_name: productName })
+    })
+    .then(response => response.json())
+    .then(data => {
+      // Fill in the form fields
+      document.getElementById("name_box").value = productName;
+
+      if (data.brand) {
+        document.getElementById("brand_box").value = data.brand;
+      }
+      if (data.pao_months) {
+        document.getElementById("pao_months_box").value = data.pao_months;
+      }
+
+      // Match category name to dropdown
+      if (data.category) {
+        const select = document.getElementById("category_id_box");
+        for (let option of select.options) {
+          if (option.text.toLowerCase() === data.category.toLowerCase()) {
+            option.selected = true;
+            break;
+          }
+        }
+      }
+
+      status.textContent = "Found! Check the details below and set your open date.";
+      status.style.color = "green";
+      btn.disabled = false;
+    })
+    .catch(error => {
+      status.textContent = "Something went wrong. Fill in manually.";
+      status.style.color = "red";
+      btn.disabled = false;
+    });
+  }
+</script>
